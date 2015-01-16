@@ -32,11 +32,11 @@ DEST_DOTSBOX=${HOME}/.dotsbox
 # os_verification
 os_verification() {
 	echo ""
-	echo "Step 0 : VERIFY "$(uname -s)" != "Darwin""
+	echo "Step 0 : VERIFY '$(uname -s)' != 'Darwin'"
 	[[ "$(uname -s)" != "Darwin" ]] && exit 0
 	echo " ---> OS Type: Darwin"
   	echo "*** Before running this script, you should do the following things:"
-  	echo " ---> run "ssh-keygen" to generate your SSH key"
+  	echo " ---> run 'ssh-keygen' to generate your SSH key"
   	echo " ---> add the key to GitHub"
 }
 
@@ -68,7 +68,7 @@ install_homebrew() {
     	return
 	fi
 
-	echo "Step 2b : INSTALL ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)""
+	echo "Step 2b : INSTALL ruby -e $(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   	ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 	echo "Step 2c : RUN brew doctor"
@@ -78,15 +78,15 @@ install_homebrew() {
 # Install packages for running Ansible playbook
 install_ansible() {
 	echo ""
-	echo "Step 3a : VERIFY ! -x `which pip`"
+	echo "Step 3a : VERIFY pip"
 	if [[ ! -x `which pip` ]]; then
 		echo "Step 3b : INSTALL easy_install pip"
 		sudo easy_install pip
 	fi
 
-	echo "Step 3c : VERIFY  -x `which pip` && ! -x `which ansible` "
+	echo "Step 3c : VERIFY pip && ansible "
 	if [[ -x `which pip` && ! -x `which ansible` ]]; then
-		echo "Step 3d : INSTALL sudo CFLAGS=-Qunused-arguments CPPFLAGS=-Qunused-arguments pip install ansible"
+		echo "Step 3d : INSTALL ansible"
 		sudo CFLAGS=-Qunused-arguments CPPFLAGS=-Qunused-arguments pip install ansible
 	fi
 }
@@ -94,7 +94,7 @@ install_ansible() {
 # Clone my GitHub repository
 clone_dots() {
 	echo ""
-	echo "Step 4a : VERIFY  -d ${DEST_DOTSBOX}/${DOTS}"
+	echo "Step 4a : VERIFY  dots"
   	if [[ -d ${DEST_DOTSBOX}/${DOTS} ]]; then
     	echo " ---> Repository ${USER}/${DOTS} is already cloned."
     	return
@@ -115,7 +115,7 @@ provision_dots() {
 	echo "Step 5a : INSTALL brew install git"
   	brew install git
 	echo "Step 5b : RUN  cd $DEST_DOTSBOX/${DOTS}"
-	cd $DEST_DOTSBOX/${DOTS}
+	cd "$DEST_DOTSBOX/${DOTS}"
 	echo "Step 5c : EXEC script/bootstrap"
 	script/bootstrap
 }
@@ -123,7 +123,7 @@ provision_dots() {
 # Clone my GitHub repository
 clone_box() {
   	echo ""
-	echo "Step 6a : VERIFY  -d ${DEST_DOTSBOX}/${BOX}"
+	echo "Step 6a : VERIFY  box"
   	if [[ -d ${DEST_DOTSBOX}/${BOX} ]]; then
     	echo " ---> Repository ${USER}/${BOX} is already cloned."
     	return
@@ -143,7 +143,7 @@ clone_box() {
 provision_box() {
 	echo ""
 	echo "Step 7a : RUN  cd $DEST_DOTSBOX/${BOX}"
-  	cd ${DEST_DOTSBOX}/${BOX}
+  	cd "${DEST_DOTSBOX}/${BOX}"
   	echo " ---> Start provisioning..."
   	echo "Step 7b : EXEC  ansible-playbook site.yml"
   	ansible-playbook site.yml
