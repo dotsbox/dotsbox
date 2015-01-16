@@ -32,9 +32,9 @@ DEST_DOTSBOX=${HOME}/.dotsbox
 # os_verification
 os_verification() {
 	echo ""
-	echo "Step 0 : RUN "$(uname -s)" != "Darwin""
+	echo "Step 0 : VERIFY "$(uname -s)" != "Darwin""
 	[[ "$(uname -s)" != "Darwin" ]] && exit 0
-  	echo ""
+	echo " ---> OS Type: Darwin"
   	echo "*** Before running this script, you should do the following things:"
   	echo " ---> run "ssh-keygen" to generate your SSH key"
   	echo " ---> add the key to GitHub"
@@ -43,15 +43,14 @@ os_verification() {
 # Install Xcode
 install_xcode() {
 	echo ""
-	echo "Step 1a : RUN -x /usr/bin/gcc"
+	echo "Step 1a : VERIFY -x /usr/bin/gcc"
 	# Download and install Command Line Tools
 	if [[ -x /usr/bin/gcc ]]; then
 		echo " ---> Xcode is already installed."
 		return
 	fi
 
-	echo "Step 1b : RUN xcode-select --install"
-	echo "Info   | Install   | Xcode"
+	echo "Step 1b : INSTALL xcode-select --install"
 	echo "*** If a dialog is shown, \
 	push 'Get Xcode' button to download Xcode before proceeding! ***"
 	xcode-select --install
@@ -63,35 +62,31 @@ install_xcode() {
 # Install Homebrew
 install_homebrew() {
 	echo ""
-	echo "Step 2a : RUN --f /usr/local/bin/brew"
+	echo "Step 2a : VERIFY --f /usr/local/bin/brew"
   	if [[ -f /usr/local/bin/brew ]]; then
     	echo " ---> Homebrew is already installed."
     	return
 	fi
 
-	echo "Step 2b : RUN ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)""
-  	echo "Info   | Install   | Homebrew"
+	echo "Step 2b : INSTALL ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)""
   	ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 	echo "Step 2c : RUN brew doctor"
-  	echo "Info   | Run   | Brew Doctor"
   	brew doctor
 }
 
 # Install packages for running Ansible playbook
 install_ansible() {
 	echo ""
-	echo "Step 3a : RUN ! -x `which pip`"
+	echo "Step 3a : VERIFY ! -x `which pip`"
 	if [[ ! -x `which pip` ]]; then
-		echo "Step 3b : RUN easy_install pip"
-		echo "Info   | Install   | PIP"
+		echo "Step 3b : INSTALL easy_install pip"
 		sudo easy_install pip
 	fi
 
-	echo "Step 3c : RUN  -x `which pip` && ! -x `which ansible` "
+	echo "Step 3c : VERIFY  -x `which pip` && ! -x `which ansible` "
 	if [[ -x `which pip` && ! -x `which ansible` ]]; then
-		echo "Step 3d : RUN sudo CFLAGS=-Qunused-arguments CPPFLAGS=-Qunused-arguments pip install ansible"
-		echo "Info   | Install   | Ansible"
+		echo "Step 3d : INSTALL sudo CFLAGS=-Qunused-arguments CPPFLAGS=-Qunused-arguments pip install ansible"
 		sudo CFLAGS=-Qunused-arguments CPPFLAGS=-Qunused-arguments pip install ansible
 	fi
 }
@@ -99,40 +94,36 @@ install_ansible() {
 # Clone my GitHub repository
 clone_dots() {
 	echo ""
-	echo "Step 4a : RUN  -d ${DEST_DOTSBOX}/${DOTS}"
+	echo "Step 4a : VERIFY  -d ${DEST_DOTSBOX}/${DOTS}"
   	if [[ -d ${DEST_DOTSBOX}/${DOTS} ]]; then
     	echo " ---> Repository ${USER}/${DOTS} is already cloned."
     	return
   	fi
 
-	echo "Step 4b : RUN  mkdir -p $DEST_DOTSBOX"
+	echo "Step 4b : MAKE  mkdir -p $DEST_DOTSBOX"
   	mkdir -p $DEST_DOTSBOX
 
   	echo "Step 4c : RUN  cd $DEST_DOTSBOX"
   	cd $DEST_DOTSBOX
 
-	echo "Step 4d : RUN  git clone git@github.com:${USER}/${DOTS}.git"
-  	echo "Info   | Clone   | ${USER}/${DOTS}"
+	echo "Step 4d : CLONE  git clone git@github.com:${USER}/${DOTS}.git"
   	git clone --recursive git@github.com:${USER}/${DOTS}.git
 }
 
 provision_dots() {
 	echo ""
-	echo "Step 5a : RUN brew install git"
-  	echo "Info   | Run   | Brew Install Git"
+	echo "Step 5a : INSTALL brew install git"
   	brew install git
-
 	echo "Step 5b : RUN  cd $DEST_DOTSBOX/${DOTS}"
 	cd $DEST_DOTSBOX/${DOTS}
-	echo "Step 5c : RUN script/bootstrap"
+	echo "Step 5c : EXEC script/bootstrap"
 	script/bootstrap
-
 }
 
 # Clone my GitHub repository
 clone_box() {
   	echo ""
-	echo "Step 4a : RUN  -d ${DEST_DOTSBOX}/${BOX}"
+	echo "Step 6a : VERIFY  -d ${DEST_DOTSBOX}/${BOX}"
   	if [[ -d ${DEST_DOTSBOX}/${BOX} ]]; then
     	echo " ---> Repository ${USER}/${BOX} is already cloned."
     	return
@@ -141,21 +132,20 @@ clone_box() {
 	# echo "Step 4b : RUN  mkdir -p $DEST_DOTSBOX"
   	# mkdir -p $DEST_DOTSBOX
 
-  	echo "Step 4b : RUN  cd $DEST_DOTSBOX"
+  	echo "Step 6b : RUN  cd $DEST_DOTSBOX"
   	cd $DEST_DOTSBOX
 
-	echo "Step 4c : RUN  git clone git@github.com:${USER}/${BOX}.git"
-  	echo "Info   | Clone   | ${USER}/${BOX}"
+	echo "Step 6c : CLONE  git clone git@github.com:${USER}/${BOX}.git"
   	git clone git@github.com:${USER}/${BOX}.git
 }
 
 # Provision
 provision_box() {
 	echo ""
-	echo "Step 6a : RUN  cd $DEST_DOTSBOX/${BOX}"
+	echo "Step 7a : RUN  cd $DEST_DOTSBOX/${BOX}"
   	cd ${DEST_DOTSBOX}/${BOX}
   	echo " ---> Start provisioning..."
-  	echo "Step 6b : RUN  ansible-playbook site.yml"
+  	echo "Step 7b : EXEC  ansible-playbook site.yml"
   	ansible-playbook site.yml
 }
 
@@ -165,7 +155,9 @@ run() {
   	install_xcode
   	install_homebrew
   	clone_dots
+  	provision_dots
   	clone_box
+  	provision_box
 }
 
 run
