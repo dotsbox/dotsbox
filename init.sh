@@ -154,10 +154,10 @@ run() {
 	os_verification
   	install_xcode
   	install_homebrew
-  	clone_dots
-  	provision_dots
-  	clone_box
-  	provision_box
+  	#clone_dots
+  	#provision_dots
+  	#clone_box
+  	#provision_box
 }
 
 run
